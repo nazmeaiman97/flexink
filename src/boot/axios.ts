@@ -30,14 +30,6 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => {
     Loading.hide();
-    if (response.data.message !== null) {
-      Notify.create({
-        color: 'positive',
-        position: 'bottom',
-        message: response.data.message,
-        icon: 'check',
-      });
-    }
     return response;
   },
   (error) => {
