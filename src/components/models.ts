@@ -1,32 +1,39 @@
 export interface FileDataType {
-  id: Number;
-  size: String;
-  downloadCount: Number;
-  filename: String;
+  id: number;
+  size: string;
+  downloadCount: number;
+  filename: string;
+}
+
+export interface uploadedFileDataType {
+  filename: string;
+  originalFilename: string;
+  fileSize: number;
+  contentType: string;
 }
 
 export interface Register {
-  id: Number;
-  title: String;
-  content: String;
+  id: number;
+  title: string;
+  content: string;
   view: number;
-  attachedFile: { id: Number; attachedFileInfos: Array<FileDataType> };
+  attachedFile: { id: number; attachedFileInfos: Array<FileDataType> };
 }
 
 export interface ListDataType {
-  id: Number;
-  title: String;
-  view: Number;
+  id: number;
+  title: string;
+  view: number;
 }
 
 export interface subMenuDataType {
-  menuName: String;
-  url: String;
-  subMenu: Array<String>;
+  menuName: string;
+  url: string;
+  subMenu: Array<string>;
 }
 
 export interface menuDataType {
-  menuName: String;
-  url: String;
+  menuName: string;
+  url: string;
   subMenu: Array<subMenuDataType>;
 }

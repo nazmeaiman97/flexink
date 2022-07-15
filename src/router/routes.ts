@@ -10,10 +10,24 @@ const routes: RouteRecordRaw[] = [
         path: 'bbs',
         component: () => import('layouts/MainLayout.vue'),
         children: [
-          { path: 'register', component: () => import('pages/Register.vue') },
-          { path: 'list', component: () => import('pages/List.vue') },
+          {
+            path: 'register',
+            component: () => import('pages/BBSRegister.vue'),
+          },
+          { path: 'list', component: () => import('pages/BBSList.vue') },
           { path: 'view/:id?', component: () => import('pages/ViewList.vue') },
           { path: 'modify/:id?', component: () => import('pages/Modify.vue') },
+        ],
+      },
+      {
+        path: 'member',
+        component: () => import('layouts/MainLayout.vue'),
+        children: [
+          {
+            path: 'register',
+            component: () => import('pages/MemberRegister.vue'),
+          },
+          { path: 'list', component: () => import('pages/MemberList.vue') },
         ],
       },
     ],

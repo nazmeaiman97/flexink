@@ -1,5 +1,6 @@
 <template>
   <q-page class="items-center justify-evenly q-ma-lg">
+    <TitlePage />
     <div class="q-pa-md">
       <q-table
         title="List"
@@ -9,7 +10,7 @@
         v-model:pagination="pagination"
         :table-style="
           'counter-reset: cssRowCounter ' +
-          (pagination.page - 1) * pagination.rowsPerPage +
+          (startPage - 1) * pagination.rowsPerPage +
           ';'
         "
       >
@@ -93,9 +94,11 @@ const columns = [
 import { defineComponent, ref, onMounted, watch } from 'vue';
 import { ListDataType } from 'components/models';
 import { api } from 'boot/axios';
+import TitlePage from 'components/TitlePage.vue';
 
 export default defineComponent({
-  name: 'ListPage',
+  name: 'BBSListPage',
+  components: { TitlePage },
 
   setup() {
     const postList = ref<Array<ListDataType>>([]);

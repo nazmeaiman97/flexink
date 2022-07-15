@@ -1,6 +1,6 @@
 <template>
   <q-page class="items-center justify-evenly q-ma-lg" v-if="apiReady">
-    <div class="text-weight-bold text-h6 q-pb-lg">BBS VIEW</div>
+    <TitlePage title="BBS View" />
     <q-card class="bg-white q-pa-xl">
       <div class="row item-center" style="display: flex; text-align: center">
         <div class="col-2 .text-subtitle1 q-pb-xl">Title</div>
@@ -45,7 +45,6 @@
         <q-btn color="warning" :to="`/bbs/modify/${$route.params.id}`"
           >Modify</q-btn
         >
-        <q-btn color="negative" @click="deleteNotify()">Delete</q-btn>
       </q-card-actions>
     </q-card>
   </q-page>
@@ -55,12 +54,12 @@
 import { defineComponent, ref, onMounted } from 'vue';
 import { Register, FileDataType } from 'components/models';
 import { api } from 'boot/axios';
-import { useRoute, useRouter } from 'vue-router';
-import { useQuasar } from 'quasar';
+import { useRoute } from 'vue-router';
+import TitlePage from 'components/TitlePage.vue';
 
 export default defineComponent({
   name: 'ViewListPage',
-  components: {},
+  components: { TitlePage },
   setup() {
     const register = ref<Register>({
       id: 0,
@@ -74,8 +73,6 @@ export default defineComponent({
     });
     const apiReady = ref<boolean>(false);
     const route = useRoute();
-    const router = useRouter();
-    const $q = useQuasar();
 
     onMounted(() => {
       getPost();
@@ -102,32 +99,10 @@ export default defineComponent({
       );
     };
 
-    const deleteNotify = () => {
-      $q.notify({
-        message: 'Are you sure want to delete this post?',
-        color: 'white',
-        textColor: 'negative',
-        icon: 'delete',
-        actions: [
-          {
-            label: 'Yes',
-            color: 'negative',
-            handler: () => {
-              api
-                .delete(`/public/bbs/post/${route.params.id}`)
-                .then(() => router.push('/bbs/list'));
-            },
-          },
-        ],
-        closeBtn: 'Cancel',
-      });
-    };
-
     return {
       register,
       apiReady,
       downloadFile,
-      deleteNotify,
     };
   },
 });

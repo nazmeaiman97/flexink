@@ -1,5 +1,6 @@
 <template>
   <q-page class="items-center justify-evenly q-ma-lg">
+    <TitlePage />
     <div class="text-weight-bold q-pb-lg">Register</div>
     <form @submit.prevent.stop="registerPost" class="q-gutter-md">
       <div class="row">
@@ -25,26 +26,9 @@
           />
         </div>
         <div class="col-2">Files</div>
-        <div class="col-3">
-          <q-file
-            v-model="newFile"
-            :disable="disableUploadBtn"
-            label="Pick files"
-            outlined
-            use-chips
-            multiple
-            append
-            style="max-width: 300px"
-          />
-        </div>
-        <div class="cols-3 q-pl-lg q-mt-sm">
-          <q-btn
-            @click="uploadFile"
-            :disable="newFile.length === 0 || disableUploadBtn"
-            class="full-width"
-            color="primary"
-            >Upload</q-btn
-          >
+
+        <div>
+          <UploadedFile title="File" ref="uploadRef" />
         </div>
       </div>
       <div class="row q-pt-lg">
@@ -60,10 +44,12 @@ import { defineComponent, ref } from 'vue';
 import { api } from 'boot/axios';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
+import UploadedFile from 'components/UploadedFile.vue';
+import TitlePage from 'components/TitlePage.vue';
 
 export default defineComponent({
-  name: 'RegisterPage',
-  components: {},
+  name: 'BBSRegisterPage',
+  components: { UploadedFile, TitlePage },
   setup() {
     const register = ref<Register>({
       id: 0,
@@ -75,28 +61,12 @@ export default defineComponent({
         attachedFileInfos: <Array<FileDataType>>[],
       },
     });
-    const newFile = ref([]);
     const titleRef = ref<any>(null);
     const contentRef = ref<any>(null);
+    const uploadRef = ref<any>(null);
     const disableUploadBtn = ref<boolean>(false);
     const router = useRouter();
     const $q = useQuasar();
-
-    const uploadFile = () => {
-      const formData = new FormData();
-      const config = {
-        headers: {
-          'content-type': 'multipart/form-data',
-        },
-      };
-      newFile.value.forEach((file) => {
-        formData.append('file', file);
-      });
-      api.post('/public/bbs/post/file', formData, config).then((response) => {
-        register.value.attachedFile.attachedFileInfos = response.data;
-        disableUploadBtn.value = true;
-      });
-    };
 
     const registerPost = () => {
       titleRef.value.validate();
@@ -104,7 +74,7 @@ export default defineComponent({
 
       if (titleRef.value.hasError || contentRef.value.hasError) {
         return;
-      } else if (newFile.value.length === 0) {
+      } else if (uploadRef.value.uploadedFile.length === 0) {
         return $q.notify({
           message: 'Need to upload file before saving the post',
           icon: 'upload',
@@ -117,7 +87,7 @@ export default defineComponent({
           title: register.value.title,
           content: register.value.content,
           attachedFile: {
-            attachedFileInfos: register.value.attachedFile.attachedFileInfos,
+            attachedFileInfos: uploadRef.value.uploadedFile,
           },
         })
         .then(() => {
@@ -127,12 +97,11 @@ export default defineComponent({
 
     return {
       register,
-      uploadFile,
-      newFile,
-      registerPost,
       disableUploadBtn,
       titleRef,
       contentRef,
+      uploadRef,
+      registerPost,
     };
   },
 });

@@ -1,6 +1,6 @@
 <template>
   <q-page v-if="apiReady" class="items-center justify-evenly q-ma-lg">
-    <div class="text-weight-bold q-pb-lg">Modify</div>
+    <TitlePage title="BBS Register" />
     <form @submit.prevent.stop="SaveChanges" class="q-gutter-md">
       <div class="row">
         <div class="col-2">Title</div>
@@ -26,13 +26,13 @@
         </div>
         <div class="col-2">Files</div>
         <div class="col-9">
-          <div class="text-subtitle2" v-for="file in allFile" :key="file.id">
+          <div
+            class="text-subtitle2"
+            v-for="file in register.attachedFile.attachedFileInfos"
+            :key="file.id"
+          >
             <div class="row">
-              {{
-                'originalFilename' in file
-                  ? file.originalFilename
-                  : file.filename
-              }}
+              {{ file.filename }}
               <q-icon
                 @click="deleteFile(file.id)"
                 name="delete"
@@ -41,38 +41,26 @@
               />
             </div>
           </div>
-          <div class="col-3" style="display: inline-flex">
-            <q-file
-              v-model="newFile"
-              :disable="disableUploadBtn"
-              label="Add files"
-              outlined
-              use-chips
-              multiple
-              append
-              style="max-width: 300px"
-            />
-            <div class="q-ml-md q-mt-sm">
-              <q-btn
-                @click="uploadFileBtn"
-                class="full-width"
-                color="primary"
-                :disable="newFile.length === 0 || disableUploadBtn"
-                >Upload</q-btn
-              >
+          <div class="cols-3 q-mt-sm">
+            <div>
+              <UploadedFile title="New File" ref="uploadRef" />
             </div>
           </div>
-          <div class="cols-3 q-pl-lg q-mt-sm"></div>
         </div>
       </div>
-      <div class="row q-pt-lg">
-        <q-btn
-          type="submit"
-          :disable="register.attachedFile.length === 0"
-          class="full-width"
-          color="primary"
-          >Save
-        </q-btn>
+      <div class="row q-pt-lg" style="place-content: center">
+        <div class="cols-6 q-pr-lg">
+          <q-btn color="negative" @click="deletePost()">Delete</q-btn>
+        </div>
+        <div class="cols-6">
+          <q-btn
+            type="submit"
+            :disable="register.attachedFile.length === 0"
+            class="full-width"
+            color="primary"
+            >Save
+          </q-btn>
+        </div>
       </div>
     </form>
   </q-page>
@@ -83,10 +71,13 @@ import { Register, FileDataType } from 'components/models';
 import { defineComponent, onMounted, ref } from 'vue';
 import { api } from 'boot/axios';
 import { useRoute, useRouter } from 'vue-router';
+import UploadedFile from 'components/UploadedFile.vue';
+import TitlePage from 'components/TitlePage.vue';
+import { useQuasar } from 'quasar';
 
 export default defineComponent({
   name: 'ModifyPage',
-  components: {},
+  components: { UploadedFile, TitlePage },
   setup() {
     const register = ref<Register>({
       id: 0,
@@ -98,16 +89,15 @@ export default defineComponent({
         attachedFileInfos: <Array<FileDataType>>[],
       },
     });
-    const newFile = ref([]);
-    const newUploadedFile = ref<Array<FileDataType>>([]);
     const tempDeleteFile = ref<Array<FileDataType>>([]);
-    const allFile = ref<Array<FileDataType>>([]);
     const apiReady = ref<boolean>(false);
     const titleRef = ref<any>(null);
     const contentRef = ref<any>(null);
+    const uploadRef = ref<any>(null);
     const disableUploadBtn = ref<boolean>(false);
     const route = useRoute();
     const router = useRouter();
+    const $q = useQuasar();
 
     onMounted(() => {
       getSinglePost();
@@ -116,18 +106,20 @@ export default defineComponent({
     const getSinglePost = () => {
       api.get(`/public/bbs/post/${route.params.id}`).then((response) => {
         register.value = response.data;
-        allFile.value = response.data.attachedFile.attachedFileInfos;
         apiReady.value = true;
       });
     };
 
     const deleteFile = (id: number) => {
-      allFile.value = allFile.value.filter((file) => {
-        if (file.id === id) {
-          tempDeleteFile.value.push(file);
+      let currentFile = register.value.attachedFile.attachedFileInfos;
+      register.value.attachedFile.attachedFileInfos = currentFile.filter(
+        (file) => {
+          if (file.id === id) {
+            tempDeleteFile.value.push(file);
+          }
+          return file.id !== id;
         }
-        return file.id !== id;
-      });
+      );
     };
 
     const SaveChanges = () => {
@@ -153,44 +145,43 @@ export default defineComponent({
           title: register.value.title,
           content: register.value.content,
           attachedFile: {
-            attachedFileInfos: newUploadedFile.value,
+            attachedFileInfos: uploadRef.value.uploadedFile,
           },
         })
         .then(() => router.push('/bbs/list'));
     };
 
-    const uploadFileBtn = () => {
-      const formData = new FormData();
-      const config = {
-        headers: {
-          'content-type': 'multipart/form-data',
-        },
-      };
-      newFile.value.forEach((file) => {
-        formData.append('file', file);
-      });
-      api.post('/public/bbs/post/file', formData, config).then((response) => {
-        response.data.forEach((res: any) => {
-          allFile.value.push(res);
-          console.table(allFile.value);
-          newUploadedFile.value.push(res);
-        });
-        disableUploadBtn.value = true;
+    const deletePost = () => {
+      $q.notify({
+        message: 'Are you sure want to delete this post?',
+        color: 'white',
+        textColor: 'negative',
+        icon: 'delete',
+        actions: [
+          {
+            label: 'Yes',
+            color: 'negative',
+            handler: () => {
+              api
+                .delete(`/public/bbs/post/${route.params.id}`)
+                .then(() => router.push('/bbs/list'));
+            },
+          },
+        ],
+        closeBtn: 'Cancel',
       });
     };
 
     return {
       register,
-      allFile,
-      newFile,
-      newUploadedFile,
       tempDeleteFile,
       deleteFile,
-      uploadFileBtn,
       SaveChanges,
+      deletePost,
       disableUploadBtn,
       titleRef,
       contentRef,
+      uploadRef,
       apiReady,
     };
   },
