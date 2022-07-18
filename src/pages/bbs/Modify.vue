@@ -53,13 +53,7 @@
           <q-btn color="negative" @click="deletePost()">Delete</q-btn>
         </div>
         <div class="cols-6">
-          <q-btn
-            type="submit"
-            :disable="register.attachedFile.length === 0"
-            class="full-width"
-            color="primary"
-            >Save
-          </q-btn>
+          <q-btn type="submit" class="full-width" color="primary">Save </q-btn>
         </div>
       </div>
     </form>
@@ -128,10 +122,7 @@ export default defineComponent({
 
       if (titleRef.value.hasError || contentRef.value.hasError) {
         return;
-      } else if (register.value.attachedFile.attachedFileInfos.length === 0) {
-        return;
       }
-
       //Check deleted file exist
       if (tempDeleteFile.value.length > 0) {
         tempDeleteFile.value.forEach((file) => {

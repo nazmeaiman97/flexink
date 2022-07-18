@@ -43,7 +43,6 @@ import { Register, FileDataType } from 'components/models';
 import { defineComponent, ref } from 'vue';
 import { api } from 'boot/axios';
 import { useRouter } from 'vue-router';
-import { useQuasar } from 'quasar';
 import UploadedFile from 'components/UploadedFile.vue';
 import TitlePage from 'components/TitlePage.vue';
 
@@ -66,7 +65,6 @@ export default defineComponent({
     const uploadRef = ref<any>(null);
     const disableUploadBtn = ref<boolean>(false);
     const router = useRouter();
-    const $q = useQuasar();
 
     const registerPost = () => {
       titleRef.value.validate();
@@ -74,12 +72,6 @@ export default defineComponent({
 
       if (titleRef.value.hasError || contentRef.value.hasError) {
         return;
-      } else if (uploadRef.value.uploadedFile.length === 0) {
-        return $q.notify({
-          message: 'Need to upload file before saving the post',
-          icon: 'upload',
-          color: 'negative',
-        });
       }
 
       api

@@ -12,11 +12,17 @@ const routes: RouteRecordRaw[] = [
         children: [
           {
             path: 'register',
-            component: () => import('pages/BBSRegister.vue'),
+            component: () => import('pages/bbs/Register.vue'),
           },
-          { path: 'list', component: () => import('pages/BBSList.vue') },
-          { path: 'view/:id?', component: () => import('pages/ViewList.vue') },
-          { path: 'modify/:id?', component: () => import('pages/Modify.vue') },
+          { path: 'list', component: () => import('pages/bbs/List.vue') },
+          {
+            path: 'view/:id?',
+            component: () => import('src/pages/bbs/View.vue'),
+          },
+          {
+            path: 'modify/:id?',
+            component: () => import('src/pages/bbs/Modify.vue'),
+          },
         ],
       },
       {
@@ -25,9 +31,9 @@ const routes: RouteRecordRaw[] = [
         children: [
           {
             path: 'register',
-            component: () => import('pages/MemberRegister.vue'),
+            component: () => import('pages/register/Register.vue'),
           },
-          { path: 'list', component: () => import('pages/MemberList.vue') },
+          { path: 'list', component: () => import('pages/register/List.vue') },
         ],
       },
     ],
